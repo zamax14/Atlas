@@ -1,0 +1,58 @@
+name: Bug
+description: Algo no funciona como dice la documentación
+title: "fix(scope): descripción en una línea"
+labels: ["bug"]
+body:
+  - type: dropdown
+    id: component
+    attributes:
+      label: Componente
+      options:
+        - core
+        - postgis
+        - layers
+        - wfs
+        - wms
+        - styles
+        - rendering
+        - exports
+        - api
+        - integration
+        - ci
+        - "no lo sé"
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproducción
+      description: Los pasos mínimos. Si hay una petición HTTP o un snippet, ponlo.
+      render: bash
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Qué debería pasar
+      description: Y dónde lo dice — doc, requerimiento o estándar.
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Qué pasa
+      description: Salida real, traceback completo si lo hay.
+      render: text
+    validations:
+      required: true
+
+  - type: input
+    id: versions
+    attributes:
+      label: Versiones
+      placeholder: "atlas-geo 0.1.0 · Python 3.11 · PostGIS 3.4"
+    validations:
+      required: true

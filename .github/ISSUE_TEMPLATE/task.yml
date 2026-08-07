@@ -1,0 +1,118 @@
+name: Tarea
+description: Unidad de trabajo atómica, implementable sin preguntar y revisable en minutos
+title: "type(scope): descripción en una línea"
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Una tarea = un módulo + un contrato + un archivo de test. Si no cabe en 300 líneas de
+        diff, no es una tarea: son dos. Ver [CONTRIBUTING.md](../blob/master/CONTRIBUTING.md).
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Componente
+      description: Determina qué `docs/components/*.md` hay que leer antes de empezar.
+      options:
+        - core
+        - postgis
+        - layers
+        - wfs
+        - wms
+        - styles
+        - rendering
+        - exports
+        - api
+        - integration
+        - ci
+        - docs
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Contexto
+      description: Qué falta y por qué hace falta ahora. Dos o tres frases.
+      placeholder: |
+        WFS necesita traducir filtros de query string a SQL seguro. Sin esto, GetFeature solo
+        puede devolver la capa completa.
+    validations:
+      required: true
+
+  - type: textarea
+    id: docs
+    attributes:
+      label: Documentación a leer
+      description: Rutas concretas. El implementador no debería necesitar nada más.
+      value: |
+        - `docs/components/<componente>.md`
+        - `docs/components/security.md` (si toca SQL, filtros o permisos)
+        - `requirements.md` §
+    validations:
+      required: true
+
+  - type: textarea
+    id: contract
+    attributes:
+      label: Contrato esperado
+      description: Firmas de lo que se expone al terminar. Sin implementación.
+      render: python
+      placeholder: |
+        def parse_filters(params: Mapping[str, str], layer: Layer) -> list[Filter]: ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: files
+    attributes:
+      label: Archivos
+      description: Qué se crea o modifica. Si son más de 4, probablemente hay que partir el issue.
+      value: |
+        - `src/atlas/`
+        - `tests/`
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Criterios de aceptación
+      description: Checkboxes verificables, no deseos. Cada uno debe poder marcarse sin discusión.
+      value: |
+        - [ ]
+        - [ ] Tests en `tests/.../test_*.py` cubren el camino feliz y los casos de error
+        - [ ] `ruff check .` y `mypy src/` pasan
+    validations:
+      required: true
+
+  - type: textarea
+    id: out_of_scope
+    attributes:
+      label: Fuera de alcance
+      description: Vinculante. Lo que aparezca aquí y en el PR se devuelve.
+      placeholder: |
+        - Operadores espaciales más allá de bbox
+        - Cachear resultados
+    validations:
+      required: true
+
+  - type: textarea
+    id: verification
+    attributes:
+      label: Verificación
+      description: El comando exacto que demuestra que funciona.
+      render: bash
+      value: |
+        docker compose up -d
+        pytest tests/<componente> -x
+    validations:
+      required: true
+
+  - type: input
+    id: depends_on
+    attributes:
+      label: Depende de
+      description: Números de issue que deben cerrarse antes. Vacío si no depende de nada.
+      placeholder: "#12, #19"
