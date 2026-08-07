@@ -65,6 +65,19 @@ Menos glamurosa, igual de real: una petición puede tumbar el proceso sin ningun
 - `statement_timeout` se aplica en cada conexión; un timeout es 504, no una conexión colgada.
 - Las descargas van en streaming con cursor server-side (§24).
 
+## Fuera de alcance
+
+Atlas **no** protege contra esto, y es responsabilidad de la aplicación host:
+
+- **Autenticación.** Atlas recibe un `principal` ya validado. No verifica tokens ni sesiones.
+- **Rate limiting y protección DoS.** Los límites de arriba acotan una petición individual, no el
+  número de peticiones. Va en el reverse proxy o en un middleware de la app.
+- **HTTPS, CORS y cabeceras de seguridad.** Son de la app host.
+- **Permisos a nivel de fila o de columna.** El grano mínimo es la capa. Si una capa tiene filas
+  que no todos pueden ver, se publica una vista con el filtro aplicado y se registra esa vista.
+- **Cifrado en reposo y gestión de secretos.** La `database_url` llega ya resuelta.
+- **Auditoría.** El `LogHook` da la información (§25), pero almacenarla y retenerla es de la app.
+
 ## Referencias
 
 `requirements.md` §13.1 (seguridad de filtros), §13.2 (operadores), §17 (auth), §18 (autorización),
