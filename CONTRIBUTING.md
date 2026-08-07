@@ -11,14 +11,29 @@ se mantienen pequeños.
    `needs-spec` hay que especificarlo antes de tocarlo; uno `blocked` espera a sus dependencias.
 2. **Lee sus dos documentos**: el `docs/components/*.md` del componente y, si toca SQL, filtros o
    permisos, `docs/components/security.md`.
-3. **Crea la rama**: `type/nombre-corto` (`feat/wfs-get-feature`, `fix/bbox-axis-order`).
-   Nunca se commitea directo a `master`.
+3. **Crea la rama desde `develop`**: `type/nombre-corto` (`feat/wfs-get-feature`,
+   `fix/bbox-axis-order`). Nunca se commitea directo a `develop` ni a `master`.
 4. **Implementa solo lo que pide el issue.** La sección *Fuera de alcance* del issue es vinculante.
    Si encuentras otra cosa que arreglar, abre otro issue.
 5. **Escribe el test.** Un módulo, un archivo de test. Sin test no está terminado.
 6. **Verifica** con el comando que el propio issue indica en su sección de verificación.
 7. **Commit de una línea**, Conventional Commits, sin cuerpo y sin co-autores.
-8. **Abre el PR** con `Closes #N` y la plantilla rellena.
+8. **Abre el PR contra `develop`** con `Closes #N` y la plantilla rellena.
+
+## Ramas
+
+```
+master   ── release ─────────────────────────────►   solo recibe releases desde develop
+              ▲
+develop  ─────┴── feat/... ── fix/... ── docs/...    integración: aquí llegan los issues
+```
+
+- `master` — estable. Cada merge es una versión publicable, etiquetada (`v0.1.0`).
+- `develop` — integración. Todos los PRs de issues apuntan aquí.
+- `type/nombre-corto` — una por issue, cortada desde `develop` y borrada al mergear.
+
+Ambas ramas base son protegidas **por convención**, no por reglas de GitHub: no hay nada que te
+impida técnicamente empujar a `develop`, y aun así no se hace.
 
 ## Definición de terminado
 

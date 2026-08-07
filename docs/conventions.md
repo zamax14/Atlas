@@ -62,8 +62,9 @@ registrado por `Atlas` las convierte en respuestas consistentes. Nunca se deja e
 - Conventional Commits de **una sola línea**: `type(scope): descripción simple`.
 - Sin cuerpo. Si el commit necesita un párrafo para justificarse, hay que partirlo.
 - Sin trailers de co-autoría.
-- Una rama por issue: `type/nombre-corto` (ej. `feat/wfs-get-feature`).
-- Nunca commit directo a `master`.
+- Una rama por issue: `type/nombre-corto` (ej. `feat/wfs-get-feature`), cortada desde `develop`.
+- Los PRs de issues van contra `develop`. `master` solo recibe releases.
+- Nunca commit directo a `develop` ni a `master`.
 
 ## Documentación
 
