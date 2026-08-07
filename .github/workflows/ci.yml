@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [master]
+    branches: [master, develop]
   pull_request:
 
 jobs:
@@ -30,22 +30,41 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # El repositorio arranca solo con documentación: no hay paquete instalable hasta que
+      # cierre el issue #1. Sin esta guarda, `cache: pip` y todos los pasos siguientes fallan.
+      # Se puede borrar en cuanto exista pyproject.toml.
+      - name: Detectar paquete
+        id: pkg
+        run: |
+          if [ -f pyproject.toml ]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Sin pyproject.toml todavía; se omiten instalación, lint, tipos y tests (issue #1)."
+          fi
+
       - uses: actions/setup-python@v5
+        if: steps.pkg.outputs.exists == 'true'
         with:
           python-version: "3.11"
           cache: pip
 
       - name: Install
+        if: steps.pkg.outputs.exists == 'true'
         run: pip install -e ".[dev,export]"
 
       - name: Lint
+        if: steps.pkg.outputs.exists == 'true'
         run: ruff check .
 
       - name: Format check
+        if: steps.pkg.outputs.exists == 'true'
         run: ruff format --check .
 
       - name: Types
+        if: steps.pkg.outputs.exists == 'true'
         run: mypy src/
 
       - name: Tests
+        if: steps.pkg.outputs.exists == 'true'
         run: pytest -v
