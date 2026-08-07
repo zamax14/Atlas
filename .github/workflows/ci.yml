@@ -1,0 +1,70 @@
+name: CI
+
+on:
+  push:
+    branches: [master, develop]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgis:
+        image: postgis/postgis:16-3.4
+        env:
+          POSTGRES_USER: atlas
+          POSTGRES_PASSWORD: atlas
+          POSTGRES_DB: atlas_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      ATLAS_TEST_DATABASE_URL: postgresql://atlas:atlas@localhost:5432/atlas_test
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # El repositorio arranca solo con documentación: no hay paquete instalable hasta que
+      # cierre el issue #1. Sin esta guarda, `cache: pip` y todos los pasos siguientes fallan.
+      # Se puede borrar en cuanto exista pyproject.toml.
+      - name: Detectar paquete
+        id: pkg
+        run: |
+          if [ -f pyproject.toml ]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Sin pyproject.toml todavía; se omiten instalación, lint, tipos y tests (issue #1)."
+          fi
+
+      - uses: actions/setup-python@v5
+        if: steps.pkg.outputs.exists == 'true'
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install
+        if: steps.pkg.outputs.exists == 'true'
+        run: pip install -e ".[dev,export]"
+
+      - name: Lint
+        if: steps.pkg.outputs.exists == 'true'
+        run: ruff check .
+
+      - name: Format check
+        if: steps.pkg.outputs.exists == 'true'
+        run: ruff format --check .
+
+      - name: Types
+        if: steps.pkg.outputs.exists == 'true'
+        run: mypy src/
+
+      - name: Tests
+        if: steps.pkg.outputs.exists == 'true'
+        run: pytest -v
