@@ -9,21 +9,14 @@ services:
     ports:
       - "${POSTGRES_PORT:-5433}:5432"
     volumes:
-      # Runs once, only when the data volume is empty. Recreate the volume to re-seed:
-      #   docker compose down -v && docker compose up -d
       - ./scripts/seed.sql:/docker-entrypoint-initdb.d/10-seed.sql:ro
       - atlas-postgis-data:/var/lib/postgresql/data
     healthcheck:
-      # -h 127.0.0.1 on purpose: while the seed runs, the entrypoint keeps a temporary server
-      # listening on the unix socket only. Checking over TCP is what makes "healthy" mean
-      # "seeded and accepting connections" instead of "initdb in progress".
       test:
         ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U ${POSTGRES_USER:-atlas} -d ${POSTGRES_DB:-atlas}"]
       interval: 5s
       timeout: 5s
       retries: 10
-      # Loading the PostGIS extensions plus the seed takes ~1 min on first boot; without a
-      # generous start_period the container is briefly reported unhealthy while still seeding.
       start_period: 120s
 
 volumes:
