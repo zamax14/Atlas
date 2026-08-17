@@ -35,6 +35,19 @@ develop  ─────┴── feat/... ── fix/... ── docs/...    int
 Ambas ramas base son protegidas **por convención**, no por reglas de GitHub: no hay nada que te
 impida técnicamente empujar a `develop`, y aun así no se hace.
 
+## Entorno de desarrollo
+
+```bash
+cp .env.example .env     # opcional: solo si necesitas cambiar puerto o credenciales
+docker compose up -d     # PostGIS 16-3.4 en localhost:5433 con el dataset de scripts/seed.sql
+```
+
+El primer arranque tarda alrededor de un minuto: carga las extensiones de PostGIS y ejecuta el
+seed. Espera a que el healthcheck marque `healthy` antes de correr los tests. El seed solo se
+ejecuta cuando el volumen está vacío; para regenerarlo, `docker compose down -v && docker compose up -d`.
+
+`.env` está en `.gitignore` y nunca se commitea: los valores por defecto viven en `.env.example`.
+
 ## Definición de terminado
 
 Un issue está terminado cuando:
