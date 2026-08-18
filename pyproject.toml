@@ -48,3 +48,6 @@ python_version = "3.11"
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["tests"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["atlas"]
