@@ -35,6 +35,13 @@ develop  ─────┴── feat/... ── fix/... ── docs/...    int
 Ambas ramas base son protegidas **por convención**, no por reglas de GitHub: no hay nada que te
 impida técnicamente empujar a `develop`, y aun así no se hace.
 
+## Entorno de desarrollo
+
+```bash
+cp .env.example .env     # opcional: solo si necesitas cambiar puerto o credenciales
+docker compose up -d     # PostGIS 16-3.4 en localhost:5433 con el dataset de scripts/seed.sql
+```
+
 ## Definición de terminado
 
 Un issue está terminado cuando:

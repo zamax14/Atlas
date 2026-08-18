@@ -50,7 +50,7 @@ registrado por `Atlas` las convierte en respuestas consistentes. Nunca se deja e
 
 ## Tests
 
-- `pytest` + `pytest-asyncio`. Los tests de PostGIS usan el contenedor de `docker-compose.yml`.
+- `pytest` + `pytest-asyncio`. Los tests de PostGIS usan el contenedor de `compose.yaml`.
 - **Un archivo de test por módulo**: `src/atlas/wfs/filters.py` → `tests/wfs/test_filters.py`.
 - Cada issue entrega su test. Un PR sin test es un PR incompleto, salvo que el issue diga
   explícitamente lo contrario.
