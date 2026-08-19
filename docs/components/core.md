@@ -12,7 +12,8 @@ compartidos, registro de CRS y enganche de logging. No contiene lógica de negoc
 ```python
 # core/config.py
 class AtlasConfig(BaseModel):
-    database_url: str
+    # frozen y extra="forbid": inmutable y sin campos desconocidos
+    database_url: str                # no vacío; se recortan espacios
     default_limit: int = 1000        # features devueltos si el cliente no pide límite
     max_limit: int = 10000           # techo absoluto para consultas paginadas
     max_download_features: int | None = None   # None = sin límite en descargas por streaming
@@ -69,6 +70,9 @@ LogHook = Callable[[OperationLog], None]
   `default_limit > max_limit` no se puede construir.
 - Una config incoherente no se puede construir: ni `default_limit > max_limit` ni
   `pool_min_size > pool_max_size`. El error es de validación, no de runtime.
+- `AtlasConfig` es **inmutable** (`frozen`) y **rechaza campos desconocidos** (`extra="forbid"`).
+  Un `max_limmit=50` mal escrito es un error de validación, no un límite ignorado en silencio;
+  y ningún componente puede saltarse los validadores mutando la config compartida.
 - El logging es un hook opcional que la app host provee. Atlas nunca configura `logging.basicConfig`
   ni escribe a stdout por su cuenta.
 - Los CRS soportados viven en un único diccionario. Añadir uno es añadir una entrada, no un `if`.

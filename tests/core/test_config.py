@@ -33,6 +33,30 @@ class TestDefaults:
             AtlasConfig()  # type: ignore[call-arg]
 
 
+class TestStrictness:
+    def test_an_unknown_field_is_rejected_instead_of_silently_ignored(self) -> None:
+        """A typo must not leave the real limit at its default without a word."""
+        with pytest.raises(ValidationError):
+            make_config(max_limmit=50)
+
+    def test_the_config_is_immutable(self) -> None:
+        config = make_config()
+
+        with pytest.raises(ValidationError):
+            config.max_limit = -5  # type: ignore[misc]
+
+        assert config.max_limit == 10000
+
+    @pytest.mark.parametrize("url", ["", "   "])
+    def test_a_blank_database_url_is_rejected(self, url: str) -> None:
+        with pytest.raises(ValidationError):
+            AtlasConfig(database_url=url)
+
+    def test_surrounding_whitespace_in_the_database_url_is_stripped(self) -> None:
+        """URLs routinely arrive from a .env file with a trailing newline."""
+        assert AtlasConfig(database_url=f"  {DATABASE_URL}\n").database_url == DATABASE_URL
+
+
 class TestResolveLimit:
     def test_no_requested_limit_falls_back_to_the_default(self) -> None:
         assert make_config().resolve_limit(None) == 1000

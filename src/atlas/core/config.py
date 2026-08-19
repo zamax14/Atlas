@@ -2,7 +2,11 @@
 
 from __future__ import annotations
 
-from pydantic import BaseModel, Field, model_validator
+from typing import Annotated
+
+from pydantic import BaseModel, ConfigDict, Field, StringConstraints, model_validator
+
+DatabaseURL = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)]
 
 
 class AtlasConfig(BaseModel):
@@ -10,9 +14,15 @@ class AtlasConfig(BaseModel):
 
     Every limit Atlas enforces lives here. Components read the values from this object instead of
     defining constants of their own.
+
+    The model is frozen and rejects unknown fields on purpose: a misspelled option must fail loudly
+    instead of leaving the real limit at its default, and a limit must not be reachable by mutating
+    a shared config past its validators.
     """
 
-    database_url: str
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    database_url: DatabaseURL
     default_limit: int = Field(default=1000, gt=0)
     max_limit: int = Field(default=10000, gt=0)
     max_download_features: int | None = Field(default=None, gt=0)
