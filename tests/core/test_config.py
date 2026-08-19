@@ -7,7 +7,9 @@ from pydantic import ValidationError
 
 from atlas.core.config import AtlasConfig
 
-DATABASE_URL = "postgresql://atlas:atlas@localhost:5432/atlas"
+# Any non-blank string works: AtlasConfig validates the URL as text and never connects.
+# `.invalid` is reserved by RFC 2606, so this can never resolve to a real host.
+DATABASE_URL = "postgresql://user:password@db.invalid/atlas"
 
 
 def make_config(**overrides: object) -> AtlasConfig:
