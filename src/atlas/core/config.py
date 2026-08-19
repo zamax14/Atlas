@@ -30,6 +30,15 @@ class AtlasConfig(BaseModel):
             )
         return self
 
+    @model_validator(mode="after")
+    def _check_pool_sizes_are_consistent(self) -> AtlasConfig:
+        if self.pool_min_size > self.pool_max_size:
+            raise ValueError(
+                f"pool_min_size ({self.pool_min_size}) cannot exceed "
+                f"pool_max_size ({self.pool_max_size})"
+            )
+        return self
+
     def resolve_limit(self, requested: int | None) -> int:
         """Return the number of features to serve for a request.
 

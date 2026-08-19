@@ -67,6 +67,8 @@ LogHook = Callable[[OperationLog], None]
 - `resolve_limit` **acota, no rechaza**: un límite pedido por encima de `max_limit` devuelve
   `max_limit`. Solo un límite no positivo es error (`ValueError`). Una config con
   `default_limit > max_limit` no se puede construir.
+- Una config incoherente no se puede construir: ni `default_limit > max_limit` ni
+  `pool_min_size > pool_max_size`. El error es de validación, no de runtime.
 - El logging es un hook opcional que la app host provee. Atlas nunca configura `logging.basicConfig`
   ni escribe a stdout por su cuenta.
 - Los CRS soportados viven en un único diccionario. Añadir uno es añadir una entrada, no un `if`.

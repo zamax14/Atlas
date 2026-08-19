@@ -88,6 +88,22 @@ class TestFieldValidation:
             make_config(max_download_features=value)
 
 
+class TestPoolConsistency:
+    def test_a_minimum_above_the_maximum_is_a_validation_error(self) -> None:
+        with pytest.raises(ValidationError):
+            make_config(pool_min_size=10, pool_max_size=5)
+
+    def test_a_minimum_equal_to_the_maximum_is_allowed(self) -> None:
+        config = make_config(pool_min_size=5, pool_max_size=5)
+
+        assert (config.pool_min_size, config.pool_max_size) == (5, 5)
+
+    def test_a_minimum_below_the_maximum_is_allowed(self) -> None:
+        config = make_config(pool_min_size=2, pool_max_size=20)
+
+        assert (config.pool_min_size, config.pool_max_size) == (2, 20)
+
+
 class TestLimitConsistency:
     def test_a_default_limit_above_the_ceiling_is_a_validation_error(self) -> None:
         with pytest.raises(ValidationError):
