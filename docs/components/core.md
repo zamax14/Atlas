@@ -24,18 +24,25 @@ class AtlasConfig(BaseModel):
 # core/exceptions.py
 class AtlasError(Exception):
     status_code: int = 500
-    code: str                        # identificador estable, ej. "layer_not_found"
+    code: str = "atlas_error"        # identificador estable, ej. "layer_not_found"
+    def __init__(self, message: str, **details: Any) -> None
+    message: str                     # texto para quien lee la respuesta
+    details: dict[str, Any]          # contexto estructurado y público; {} si no hay
 
-class LayerNotFound(AtlasError):        status_code = 404
-class ServiceDisabled(AtlasError):      status_code = 404   # capa existe pero wms/wfs off
-class UnsupportedCRS(AtlasError):       status_code = 400
-class UnsupportedFormat(AtlasError):    status_code = 400
-class InvalidFilter(AtlasError):        status_code = 400
-class InvalidGeometry(AtlasError):      status_code = 400
-class QueryTooLarge(AtlasError):        status_code = 413
-class QueryTimeout(AtlasError):         status_code = 504
-class DatabaseError(AtlasError):        status_code = 500
-class PermissionDenied(AtlasError):     status_code = 403
+# jerarquía plana: un solo nivel bajo AtlasError
+class LayerNotFound(AtlasError):        404, "layer_not_found"
+class ServiceDisabled(AtlasError):      404, "service_disabled"   # capa existe pero wms/wfs off
+class UnsupportedCRS(AtlasError):       400, "unsupported_crs"
+class UnsupportedFormat(AtlasError):    400, "unsupported_format"
+class InvalidParameter(AtlasError):     400, "invalid_parameter"  # OGC Missing/InvalidParameterValue
+class InvalidFilter(AtlasError):        400, "invalid_filter"
+class InvalidGeometry(AtlasError):      400, "invalid_geometry"
+class QueryTooLarge(AtlasError):        413, "query_too_large"
+class QueryTimeout(AtlasError):         504, "query_timeout"
+class DatabaseError(AtlasError):        500, "database_error"
+    PUBLIC_MESSAGE: str              # lo que se le dice al cliente, diga lo que diga el driver
+    technical_message: str           # el mensaje real de psycopg, solo para el log
+class PermissionDenied(AtlasError):     403, "permission_denied"
 
 def error_response(exc: AtlasError) -> dict   # {"error": {"code", "message", "details"}}
 
@@ -60,6 +67,12 @@ LogHook = Callable[[OperationLog], None]
 - `core` no importa nada de otro paquete de Atlas. Es la hoja del grafo de dependencias.
 - Toda excepción que pueda llegar al usuario hereda de `AtlasError` y tiene `status_code` y `code`.
   El `code` es parte del contrato público: no se renombra sin bump de versión.
+- Ningún `code` se repite entre excepciones: es lo que el cliente usa para distinguir el fallo.
+- `error_response` devuelve siempre la misma forma, con `details` como dict —vacío si no hay
+  contexto—, para que el cliente nunca tenga que comprobar si la clave existe.
+- `details` es payload **público**. Nada que el cliente no deba ver entra ahí: el mensaje de psycopg
+  vive en `DatabaseError.technical_message`, fuera de la respuesta, porque nombra esquemas, tablas
+  y a veces valores del query.
 - Ningún límite se aplica fuera de `AtlasConfig`. Nada de constantes mágicas dispersas.
 - El logging es un hook opcional que la app host provee. Atlas nunca configura `logging.basicConfig`
   ni escribe a stdout por su cuenta.
