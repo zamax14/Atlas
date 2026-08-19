@@ -14,6 +14,10 @@ listed here; see [docs/changelog.md](docs/changelog.md) for when and how to upda
 > convention keeps out of the changelog. The public API lands in `0.1.0`; see
 > [docs/roadmap.md](docs/roadmap.md).
 
+### Features
+
+* **core:** add AtlasConfig with query limits and connection options (#6)
+
 ### Bug Fixes
 
 * **dev:** make the seeded layers overlap and look like a real network ([218a849](https://github.com/zamax14/Atlas/commit/218a849))

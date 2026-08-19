@@ -55,6 +55,9 @@ Reglas:
 3. Un cambio incompatible se marca con `!` en el commit (`feat(wfs)!: ...`) y aparece bajo
    BREAKING CHANGES con una nota de migración.
 4. No se listan archivos tocados ni se copian cuerpos de commit — los commits son de una sola línea.
+5. **Referencia**: una entrada escrita en el mismo PR que el cambio no puede citar su propio hash
+   —todavía no existe, y un `--amend` lo invalida—, así que referencia el issue o el PR: `(#6)`.
+   Los hashes enlazados quedan para entradas de commits ya existentes o para el corte de release.
 
 ## Cómo se publica una versión
 
