@@ -60,8 +60,10 @@ class Database:
     async def _configure(self, conn: AsyncConnection[dict[str, Any]]) -> None:
         """Apply the configured query timeout to a connection the pool has just created.
 
-        The `SET` runs in autocommit so it survives at session level: inside a transaction it would
-        be undone by the rollback the pool performs when the connection goes back.
+        The `SET` runs in autocommit because the pool requires `configure` to hand the connection
+        back outside a transaction: one left in `INTRANS` is discarded and never joins the pool.
+        `SET` is transactional in PostgreSQL, so autocommit is also what makes it stick for the
+        session instead of dying with the next rollback.
         """
         timeout_ms = int(self._config.query_timeout * 1000)
         await conn.set_autocommit(True)
