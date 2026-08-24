@@ -134,6 +134,19 @@ class TestErrorTranslation:
         with pytest.raises(DatabaseError):
             [row async for row in db.stream(query("SELECT * FROM table_that_does_not_exist"))]
 
+    async def test_an_exhausted_pool_becomes_a_database_error(self, database_url: str) -> None:
+        """A saturated pool must not leak `psycopg_pool.PoolTimeout` to the host application."""
+        database = Database(AtlasConfig(database_url=database_url, pool_max_size=1))
+        await database.open()
+        try:
+            async with database.connection():
+                database.pool.timeout = 0.1
+
+                with pytest.raises(DatabaseError):
+                    await database.fetch_all(query("SELECT 1"))
+        finally:
+            await database.close()
+
 
 class TestStream:
     async def test_it_yields_every_row_as_a_dict(self, db: Database) -> None:

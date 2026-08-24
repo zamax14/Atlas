@@ -68,7 +68,8 @@ def to_geojson_feature(row: dict, id_column: str | None) -> dict
 - El `query_timeout` de `AtlasConfig` se aplica como `statement_timeout` en la conexión.
 - `open()` y `close()` son idempotentes: abrir dos veces no crea dos pools y cerrar dos veces no
   falla. El ciclo de vida del pool lo marca la app host, y puede repetir la llamada.
-- **Ninguna excepción de psycopg sale de `postgis/`.** Una consulta cancelada por el
+- **Ninguna excepción de psycopg sale de `postgis/`**, incluida la espera por un pool saturado
+  (`psycopg_pool.PoolTimeout` hereda de `psycopg.Error`). Una consulta cancelada por el
   `statement_timeout` es `QueryTimeout`; cualquier otro fallo del driver es `DatabaseError`, con el
   mensaje real en `technical_message` y fuera de la respuesta.
 
