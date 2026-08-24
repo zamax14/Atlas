@@ -16,6 +16,7 @@ listed here; see [docs/changelog.md](docs/changelog.md) for when and how to upda
 
 ### Features
 
+* **core:** add the Atlas exception hierarchy and the error response format ([87464f4](https://github.com/zamax14/Atlas/commit/87464f4))
 * **core:** make AtlasConfig frozen and reject unknown fields ([da193f5](https://github.com/zamax14/Atlas/commit/da193f5))
 * **core:** reject a pool minimum size above the maximum ([19082cf](https://github.com/zamax14/Atlas/commit/19082cf))
 * **core:** add AtlasConfig with query limits and connection options ([67501e5](https://github.com/zamax14/Atlas/commit/67501e5))
