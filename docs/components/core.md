@@ -15,14 +15,18 @@ Fuente única de todos los límites y opciones de conexión.
 
 ```python
 class AtlasConfig(BaseModel):
-    database_url: str
-    default_limit: int = 1000                   # features si el cliente no pide límite
-    max_limit: int = 10000                      # techo absoluto en consultas paginadas
-    max_download_features: int | None = None    # None = sin límite en descargas por streaming
+    # frozen y extra="forbid": inmutable y sin campos desconocidos
+    database_url: str                # no vacío; se recortan espacios
+    default_limit: int = 1000        # features devueltos si el cliente no pide límite
+    max_limit: int = 10000           # techo absoluto para consultas paginadas
+    max_download_features: int | None = None   # None = sin límite en descargas por streaming
     default_srid: int = 4326
     pool_min_size: int = 1
     pool_max_size: int = 10
-    query_timeout: float = 30.0                 # segundos
+    query_timeout: float = 30.0      # segundos
+    max_image_size: int = 4096       # lado máximo en píxeles de una imagen renderizada
+
+    def resolve_limit(self, requested: int | None) -> int
 ```
 
 ### `core/exceptions.py`
@@ -110,6 +114,14 @@ LogHook = Callable[[OperationLog], None]
 **Configuración**
 
 - Ningún límite se aplica fuera de `AtlasConfig`. Nada de constantes mágicas dispersas.
+- `resolve_limit` **acota, no rechaza**: un límite pedido por encima de `max_limit` devuelve
+  `max_limit`. Solo un límite no positivo es error (`ValueError`). Una config con
+  `default_limit > max_limit` no se puede construir.
+- Una config incoherente no se puede construir: ni `default_limit > max_limit` ni
+  `pool_min_size > pool_max_size`. El error es de validación, no de runtime.
+- `AtlasConfig` es **inmutable** (`frozen`) y **rechaza campos desconocidos** (`extra="forbid"`).
+  Un `max_limmit=50` mal escrito es un error de validación, no un límite ignorado en silencio;
+  y ningún componente puede saltarse los validadores mutando la config compartida.
 
 **Excepciones**
 
